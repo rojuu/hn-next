@@ -1,8 +1,14 @@
 import Head from "next/head";
+import Stories from "~/components/Stories";
 import { api } from "~/utils/api";
 
 export default function Home() {
-  const topStories = api.stories.top.useQuery();
+  const {
+    isLoading,
+    isError,
+    data: stories,
+    error,
+  } = api.stories.top.useQuery();
 
   return (
     <>
@@ -11,8 +17,10 @@ export default function Home() {
         <meta name="description" content="Hacker News client with Next js" />
         <link rel="icon" href="/favicon.ico" />
       </Head>
-      <main className="">
-        <ul>{topStories.data?.map((x, i) => <li key={i}>{x}</li>)}</ul>
+      <main>
+        {isLoading ? <div>Loading...</div> : <></>}
+        {isError ? <div className="text-red-500">{error.message}</div> : <></>}
+        {stories ? <Stories stories={stories} /> : <></>}
       </main>
     </>
   );
