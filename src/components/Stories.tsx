@@ -1,5 +1,5 @@
 import Story from "./Story";
-import { type Story as StoryT } from "~/server/api/routers/stories";
+import { type Story as StoryT } from "~/utils/api";
 
 type Props = {
   stories: StoryT[];

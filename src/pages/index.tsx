@@ -1,15 +1,14 @@
+import { type GetServerSideProps } from "next";
 import Head from "next/head";
+import Link from "next/link";
 import Stories from "~/components/Stories";
-import { api } from "~/utils/api";
+import { type Story, getStories } from "~/utils/api";
 
-export default function Home() {
-  const {
-    isLoading,
-    isError,
-    data: stories,
-    error,
-  } = api.stories.top.useQuery();
+type Props = {
+  stories: Story[];
+};
 
+export default function Home({ stories }: Props) {
   return (
     <>
       <Head>
@@ -17,11 +16,19 @@ export default function Home() {
         <meta name="description" content="Hacker News client with Next js" />
         <link rel="icon" href="/favicon.ico" />
       </Head>
+      <header className="bg-orange-500 p-1 font-semibold">
+        <Link href="/" className="">
+          HN Hext
+        </Link>
+      </header>
       <main>
-        {isLoading ? <div>Loading...</div> : <></>}
-        {isError ? <div className="text-red-500">{error.message}</div> : <></>}
-        {stories ? <Stories stories={stories} /> : <></>}
+        <Stories stories={stories} />
       </main>
     </>
   );
 }
+
+export const getServerSideProps: GetServerSideProps<Props> = async () => {
+  const stories = await getStories();
+  return { props: { stories } };
+};

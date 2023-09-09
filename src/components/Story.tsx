@@ -1,4 +1,4 @@
-import { type Story } from "~/server/api/routers/stories";
+import { type Story } from "~/utils/api";
 
 type Props = {
   story: Story;
