@@ -16,14 +16,16 @@ export default function Home({ stories }: Props) {
         <meta name="description" content="Hacker News client with Next js" />
         <link rel="icon" href="/favicon.ico" />
       </Head>
-      <header className="bg-orange-500 p-1 font-semibold">
-        <Link href="/" className="">
-          HN Hext
-        </Link>
-      </header>
-      <main>
-        <Stories stories={stories} />
-      </main>
+      <div className="ml-auto mr-auto max-w-7xl justify-center p-2">
+        <header className="bg-[#FF6600] pl-2  font-bold">
+          <Link href="/" className="">
+            HN Next
+          </Link>
+        </header>
+        <main className="bg-[#F6F6EF]">
+          <Stories stories={stories} />
+        </main>
+      </div>
     </>
   );
 }
