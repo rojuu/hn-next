@@ -7,7 +7,6 @@ type Story = StoryPartial | StoryFull;
 type Props = {
   story: Story;
   order?: number;
-  className?: string;
 };
 
 const getRootUrl = (story: Story): string => {
@@ -25,9 +24,9 @@ const getRootUrl = (story: Story): string => {
   return result;
 };
 
-export default function StoryInfo({ story, order, className }: Props) {
+export default function StoryInfo({ story, order }: Props) {
   return (
-    <div className={"flex flex-row" + className !== undefined ? className : ""}>
+    <div className={"flex flex-row"}>
       {order !== undefined ? (
         <div className="text-gray-500">{order}.</div>
       ) : (

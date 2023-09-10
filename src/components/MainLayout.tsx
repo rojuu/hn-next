@@ -11,7 +11,6 @@ export default function MainLayout({
       <Head>
         <title>HN Next</title>
         <meta name="description" content="Hacker News client with Next js" />
-        <link rel="icon" href="/favicon.ico" />
       </Head>
       <div className="ml-auto mr-auto justify-center xl:max-w-7xl xl:p-2">
         <header className="bg-[#FF6600] pl-2  font-bold">

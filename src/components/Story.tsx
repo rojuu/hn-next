@@ -37,8 +37,8 @@ function Comment({
 export default function Story({ story }: Props) {
   return (
     <div>
-      <StoryInfo className="mb-6" story={story} />
-      <div>
+      <StoryInfo story={story} />
+      <div className="mt-6">
         {story.kids.map((comment) => {
           return <Comment key={comment.id} comment={comment} />;
         })}
