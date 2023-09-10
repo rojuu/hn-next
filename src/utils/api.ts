@@ -30,7 +30,7 @@ export const getStories = async () => {
       return item.dead !== true && typeof type === "string" && type === "story";
     })
     .map((item) => item as Story);
-  return stories;
+  return stories.slice(0, 50);
 };
 
 export const getStory = async (id: number) => {

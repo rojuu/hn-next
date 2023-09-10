@@ -8,7 +8,6 @@ type Props = {
 };
 
 const getRootUrl = (story: Story): string => {
-  console.log(story.url);
   const url = new URL(story.url);
   let result = url.hostname;
   if (result.startsWith("www.")) {
@@ -29,7 +28,7 @@ export default function Stories({ stories }: Props) {
   return (
     <ul>
       {stories?.map((story, index) => {
-        if (story.url === undefined) return <></>;
+        if (story.url === undefined) return <li key={story.id}></li>;
         else
           return (
             <li key={story.id}>
