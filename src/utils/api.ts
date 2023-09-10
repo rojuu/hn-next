@@ -37,7 +37,7 @@ export interface StoryFull extends StoryBase {
 
 export const getStories = async () => {
   const response = await fetch(`${env.HN_API_URL}/topstories.json`);
-  const ids = (await response.json()) as number[];
+  const ids = ((await response.json()) as number[]).slice(0, 50);
   const items = await Promise.all(
     ids.map(async (id) => {
       const response = await fetch(`${env.HN_API_URL}/item/${id}.json`);
