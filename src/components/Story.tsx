@@ -1,6 +1,7 @@
 import { type CommentFull, type StoryFull } from "~/utils/api";
 import StoryInfo from "./StoryInfo";
 import { unixTimeToRelative } from "~/utils/time";
+import SanitizeHTML from "./SanitizeHtml";
 
 type Props = {
   story: StoryFull;
@@ -20,7 +21,9 @@ function Comment({
         <div className="text-xs text-gray-500">
           {comment.by} {unixTimeToRelative(comment.time)}
         </div>
-        <div className="">{comment.text}</div>
+        <div>
+          <SanitizeHTML html={comment.text} />
+        </div>
       </div>
       <div>
         {comment.kids.map((c) => {
