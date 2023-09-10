@@ -59,21 +59,26 @@ const fillCommentKids = async (
   kidIds: number[],
   depth = 0,
 ) => {
-  for (const kidId of kidIds) {
-    const response = await fetch(`${env.HN_API_URL}/item/${kidId}.json`);
-    const kid = (await response.json()) as Item;
-    if (kid.type === "comment") {
-      const comment = kid as unknown as Comment;
-      const commentFull: CommentFull = {
-        ...comment,
-        kids: [],
-      };
-      if (comment.kids) {
-        await fillCommentKids(commentFull, comment.kids, depth + 1);
+  const kids = await Promise.all(
+    kidIds.map(async (kidId) => {
+      const response = await fetch(`${env.HN_API_URL}/item/${kidId}.json`);
+      const kid = (await response.json()) as Item;
+      if (kid.type === "comment") {
+        const comment = kid as unknown as Comment;
+        const commentFull: CommentFull = {
+          ...comment,
+          kids: [],
+        };
+        if (comment.kids) {
+          await fillCommentKids(commentFull, comment.kids, depth + 1);
+        }
+        return commentFull;
       }
-      parentComment.kids.push(commentFull);
-    }
-  }
+      return null;
+    }),
+  );
+  const finalKids = kids.filter((k) => k !== null) as CommentFull[];
+  parentComment.kids = [...parentComment.kids, ...finalKids];
 };
 
 export const getStoryFull = async (id: number) => {
@@ -89,20 +94,27 @@ export const getStoryFull = async (id: number) => {
     kids: [],
   };
 
-  for (const kidId of story.kids) {
-    const response = await fetch(`${env.HN_API_URL}/item/${kidId}.json`);
-    const kid = (await response.json()) as Item;
-    if (kid.type === "comment") {
-      const comment = kid as unknown as Comment;
-      const commentFull: CommentFull = {
-        ...comment,
-        kids: [],
-      };
-      if (comment.kids) {
-        await fillCommentKids(commentFull, comment.kids);
-      }
-      storyFull.kids.push(commentFull);
-    }
+  if (story.kids) {
+    const comments = await Promise.all(
+      story.kids.map(async (kidId) => {
+        const response = await fetch(`${env.HN_API_URL}/item/${kidId}.json`);
+        const kid = (await response.json()) as Item;
+        if (kid.type === "comment") {
+          const comment = kid as unknown as Comment;
+          const commentFull: CommentFull = {
+            ...comment,
+            kids: [],
+          };
+          if (comment.kids) {
+            await fillCommentKids(commentFull, comment.kids);
+          }
+          return commentFull;
+        }
+        return null;
+      }),
+    );
+    const finalComments = comments.filter((c) => c !== null) as CommentFull[];
+    storyFull.kids = [...storyFull.kids, ...finalComments];
   }
   return storyFull;
 };
