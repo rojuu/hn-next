@@ -1,14 +1,14 @@
 import { type GetServerSideProps } from "next";
 import Head from "next/head";
 import Link from "next/link";
-import Stories from "~/components/Stories";
-import { type Story, getStories } from "~/utils/api";
+import Story from "~/components/Story";
+import { getStory, type Story as StoryT } from "~/utils/api";
 
 type Props = {
-  stories: Story[];
+  story: StoryT;
 };
 
-export default function Home({ stories }: Props) {
+export default function StoryView({ story }: Props) {
   return (
     <>
       <Head>
@@ -23,14 +23,29 @@ export default function Home({ stories }: Props) {
           </Link>
         </header>
         <main className="bg-[#F6F6EF] pb-2 pl-2 pr-2 pt-1">
-          <Stories stories={stories} />
+          <Story story={story} />
         </main>
       </div>
     </>
   );
 }
 
-export const getServerSideProps: GetServerSideProps<Props> = async () => {
-  const stories = await getStories();
-  return { props: { stories } };
+export const getServerSideProps: GetServerSideProps<Props> = async (
+  context,
+) => {
+  const { id } = context.query;
+  if (typeof id !== "string") {
+    return {
+      notFound: true,
+    };
+  }
+
+  const story = await getStory(Number(id));
+  if (story === null) {
+    return {
+      notFound: true,
+    };
+  }
+
+  return { props: { story } };
 };

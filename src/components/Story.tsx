@@ -4,9 +4,5 @@ type Props = {
   story: Story;
 };
 export default function Story({ story }: Props) {
-  return (
-    <>
-      {story.id}: {story.title}
-    </>
-  );
+  return <>{story.id}</>;
 }
