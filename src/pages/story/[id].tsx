@@ -2,10 +2,10 @@ import { type GetServerSideProps } from "next";
 import Head from "next/head";
 import Link from "next/link";
 import Story from "~/components/Story";
-import { getStory, type Story as StoryT } from "~/utils/api";
+import { getStoryFull, type StoryFull } from "~/utils/api";
 
 type Props = {
-  story: StoryT;
+  story: StoryFull;
 };
 
 export default function StoryView({ story }: Props) {
@@ -40,7 +40,7 @@ export const getServerSideProps: GetServerSideProps<Props> = async (
     };
   }
 
-  const story = await getStory(Number(id));
+  const story = await getStoryFull(Number(id));
   if (story === null) {
     return {
       notFound: true,

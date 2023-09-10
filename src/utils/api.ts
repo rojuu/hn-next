@@ -2,17 +2,38 @@ import { env } from "~/env.mjs";
 
 type Item = Record<string, string | number | number[] | boolean>;
 
-export type Story = {
+export interface ItemBase {
   id: number;
-  type: string;
-  title: string;
-  time: number;
-  score: number;
   by: string;
+  time: number;
+  type: string;
+}
+
+export interface StoryBase extends ItemBase {
+  title: string;
+  score: number;
   descendants: number;
-  kids: number[];
   url: string;
-};
+}
+
+export interface CommentBase extends ItemBase {
+  text: string;
+  time: number;
+  parent: number;
+}
+
+export interface Comment extends CommentBase {
+  kids: number[];
+}
+export interface CommentFull extends CommentBase {
+  kids: CommentFull[];
+}
+export interface Story extends StoryBase {
+  kids: number[];
+}
+export interface StoryFull extends StoryBase {
+  kids: CommentFull[];
+}
 
 export const getStories = async () => {
   const response = await fetch(`${env.HN_API_URL}/topstories.json`);
@@ -29,15 +50,59 @@ export const getStories = async () => {
       const type = item.type;
       return item.dead !== true && typeof type === "string" && type === "story";
     })
-    .map((item) => item as Story);
+    .map((item) => item as unknown as Story);
   return stories.slice(0, 50);
 };
 
-export const getStory = async (id: number) => {
+const fillCommentKids = async (
+  parentComment: CommentFull,
+  kidIds: number[],
+  depth = 0,
+) => {
+  for (const kidId of kidIds) {
+    const response = await fetch(`${env.HN_API_URL}/item/${kidId}.json`);
+    const kid = (await response.json()) as Item;
+    if (kid.type === "comment") {
+      const comment = kid as unknown as Comment;
+      const commentFull: CommentFull = {
+        ...comment,
+        kids: [],
+      };
+      if (comment.kids) {
+        await fillCommentKids(commentFull, comment.kids, depth + 1);
+      }
+      parentComment.kids.push(commentFull);
+    }
+  }
+};
+
+export const getStoryFull = async (id: number) => {
   const response = await fetch(`${env.HN_API_URL}/item/${id}.json`);
   const item = (await response.json()) as Item;
   const type = item.type;
   if (!(item.dead !== true && typeof type === "string" && type === "story"))
     return null;
-  return item as Story;
+
+  const story = item as unknown as Story;
+  const storyFull: StoryFull = {
+    ...story,
+    kids: [],
+  };
+
+  for (const kidId of story.kids) {
+    const response = await fetch(`${env.HN_API_URL}/item/${kidId}.json`);
+    const kid = (await response.json()) as Item;
+    if (kid.type === "comment") {
+      const comment = kid as unknown as Comment;
+      const commentFull: CommentFull = {
+        ...comment,
+        kids: [],
+      };
+      if (comment.kids) {
+        await fillCommentKids(commentFull, comment.kids);
+      }
+      storyFull.kids.push(commentFull);
+    }
+  }
+  return storyFull;
 };
