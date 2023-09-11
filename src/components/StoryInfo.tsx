@@ -34,7 +34,9 @@ export default function StoryInfo({ story, order }: Props) {
       )}{" "}
       <div className="flex flex-col">
         <div className="p-0 pl-2">
-          <Link href={`${story.url}`}>{story.title}</Link>{" "}
+          <Link className="visited:text-gray-500" href={`${story.url}`}>
+            {story.title}
+          </Link>{" "}
           <span className="text-xs text-gray-500">({getRootUrl(story)})</span>
         </div>
         <div className="p-0 pl-2 text-xs text-gray-500">
