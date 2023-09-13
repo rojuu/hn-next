@@ -61,7 +61,7 @@ function Comment({
       <div className="p-2">
         <div className="text-xs text-gray-500">
           <span suppressHydrationWarning>
-          {comment.by} {unixTimeToRelative(comment.time)}
+            {comment.by} {unixTimeToRelative(comment.time)}
           </span>
           <CommentLink id={parentId}>parent</CommentLink>
           <CommentLink id={prevId}>prev</CommentLink>
@@ -72,7 +72,7 @@ function Comment({
               setIsFolded((p) => !p);
             }}
           >
-            [ – ]
+            {isFolded ? `[${1 + comment.descendants} more]` : "[ – ]"}
           </span>
         </div>
         {!isFolded && (
