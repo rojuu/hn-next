@@ -60,7 +60,9 @@ function Comment({
     <div className={`${child ? "pl-10" : ""}`} id={`comment-${comment.id}`}>
       <div className="p-2">
         <div className="text-xs text-gray-500">
+          <span suppressHydrationWarning>
           {comment.by} {unixTimeToRelative(comment.time)}
+          </span>
           <CommentLink id={parentId}>parent</CommentLink>
           <CommentLink id={prevId}>prev</CommentLink>
           <CommentLink id={nextId}>next</CommentLink>{" "}
