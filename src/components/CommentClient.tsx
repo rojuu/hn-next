@@ -1,13 +1,9 @@
-import { type CommentFull, type StoryFull } from "~/utils/api";
-import StoryInfo from "./StoryInfo";
-import { unixTimeToRelative } from "~/utils/time";
-import SanitizeHTML from "./SanitizeHtml";
-import Link from "next/link";
-import { useState } from "react";
+"use client";
 
-type Props = {
-  story: StoryFull;
-};
+import { type CommentFull } from "~/utils/api";
+import React, { useState } from "react";
+import { unixTimeToRelative } from "~/utils/time";
+import Link from "next/link";
 
 const scrollToId = (id: string) => {
   const el = document.getElementById(id);
@@ -40,14 +36,18 @@ function CommentLink({
   );
 }
 
-function Comment({
+export default function Comment({
   comment,
+  commentContents,
+  commentChildren,
   nextId,
   prevId,
   parentId,
   isChild,
 }: {
   comment: CommentFull;
+  commentContents: React.ReactNode;
+  commentChildren: React.ReactNode;
   nextId?: number;
   prevId?: number;
   parentId?: number;
@@ -75,52 +75,9 @@ function Comment({
             {isFolded ? `[${1 + comment.descendants} more]` : "[ – ]"}
           </span>
         </div>
-        {!isFolded && (
-          <div>
-            <SanitizeHTML html={comment.text} />
-          </div>
-        )}
+        <div className={isFolded ? "hidden" : ""}>{commentContents}</div>
       </div>
-      {!isFolded && (
-        <div>
-          {comment.kids.map((c, index) => {
-            const prevId = comment.kids[index - 1]?.id;
-            const nextId = comment.kids[index + 1]?.id;
-            return (
-              <Comment
-                key={c.id}
-                comment={c}
-                isChild={true}
-                prevId={prevId}
-                nextId={nextId}
-                parentId={comment.id}
-              />
-            );
-          })}
-        </div>
-      )}
-    </div>
-  );
-}
-
-export default function Story({ story }: Props) {
-  return (
-    <div>
-      <StoryInfo story={story} />
-      <div className="mt-6">
-        {story.kids.map((comment, index) => {
-          const prevId = story.kids[index - 1]?.id;
-          const nextId = story.kids[index + 1]?.id;
-          return (
-            <Comment
-              key={comment.id}
-              comment={comment}
-              prevId={prevId}
-              nextId={nextId}
-            />
-          );
-        })}
-      </div>
+      <div className={isFolded ? "hidden" : ""}>{commentChildren}</div>
     </div>
   );
 }

@@ -34,9 +34,10 @@ export default function StoryInfo({ story, order }: Props) {
       )}{" "}
       <div className="flex flex-col">
         <div className="p-0 pl-2">
-          <Link className="visited:text-gray-500" href={`${story.url}`}>
+          {/* Use normal a tag for external link because they might have weird double slashes etc */}
+          <a className="visited:text-gray-500" href={`${story.url}`}>
             {story.title}
-          </Link>{" "}
+          </a>{" "}
           <span className="text-xs text-gray-500">({getRootUrl(story)})</span>
         </div>
         <div className="p-0 pl-2 text-xs text-gray-500">

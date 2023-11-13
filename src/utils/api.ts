@@ -107,7 +107,7 @@ const fillCommentKids = async (
   parentComment.kids = [...parentComment.kids, ...finalKids];
 };
 
-export const getStoryFull = async (id: number) => {
+export const getStoryPartial = async (id: number) => {
   const response = await fetch(`${env.HN_API_URL}/item/${id}.json`);
   const item = (await response.json()) as Item;
   const type = item.type;
@@ -118,10 +118,20 @@ export const getStoryFull = async (id: number) => {
       typeof type === "string" &&
       type === "story"
     )
-  )
+  ) {
     return null;
+  }
 
   const story = item as unknown as Story;
+  return story;
+};
+
+export const getStoryFull = async (id: number) => {
+  const story = await getStoryPartial(id);
+  if (!story) {
+    return null;
+  }
+
   const storyFull: StoryFull = {
     ...story,
     kids: [],
