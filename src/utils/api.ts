@@ -39,7 +39,7 @@ export interface StoryFull extends StoryBase {
 export const getStories = async () => {
   const response = await fetch(`${env.HN_API_URL}/topstories.json`);
   if (!response.ok) return null;
-  const json = await response.json();
+  const json: unknown = await response.json();
   if (!json) return null;
   const ids = (json as number[]).slice(0, 50);
   const items = await Promise.all(
@@ -103,7 +103,7 @@ const fillCommentKids = async (
     kidIds.map(async (kidId) => {
       const response = await fetch(`${env.HN_API_URL}/item/${kidId}.json`);
       if (!response.ok) return null;
-      const json = await response.json();
+      const json: unknown = await response.json();
       if (!json) return null;
       const kid = json as Item;
       return getFullCommentFromItem(kid);
@@ -116,7 +116,7 @@ const fillCommentKids = async (
 export const getStoryPartial = async (id: number) => {
   const response = await fetch(`${env.HN_API_URL}/item/${id}.json`);
   if (!response.ok) return null;
-  const json = await response.json();
+  const json: unknown = await response.json();
   if (!json) return null;
   const item = json as Item;
   const type = item.type;
@@ -151,7 +151,7 @@ export const getStoryFull = async (id: number) => {
       story.kids.map(async (kidId) => {
         const response = await fetch(`${env.HN_API_URL}/item/${kidId}.json`);
         if (!response.ok) return null;
-        const json = await response.json();
+        const json: unknown = await response.json();
         if (!json) return null;
         const kid = json as Item;
         return getFullCommentFromItem(kid);
