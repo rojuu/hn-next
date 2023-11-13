@@ -1,5 +1,5 @@
 import { notFound } from "next/navigation";
-import { Story, getStoryFull, getStoryPartial } from "~/utils/api";
+import { getStoryFull, getStoryPartial } from "~/utils/api";
 import StoryInfo from "~/components/StoryInfo";
 import Comment from "~/components/Comment";
 import { Suspense } from "react";

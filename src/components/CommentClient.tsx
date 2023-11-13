@@ -1,16 +1,56 @@
 "use client";
 
-import { type CommentFull } from "~/utils/api";
-import React, { useState } from "react";
 import { unixTimeToRelative } from "~/utils/time";
 import Link from "next/link";
+import { create } from "zustand";
+import styles from "./CommentClient.module.css";
+
+type FoldedState = {
+  foldedIds: Set<number>;
+};
+
+type FoldedStateAction = {
+  toggleFolded: (id: number) => void;
+};
+
+const getToggledFoldedIds = (state: FoldedState, id: number) => {
+  const newSet = new Set(state.foldedIds);
+  if (state.foldedIds.has(id)) {
+    newSet.delete(id);
+  } else {
+    newSet.add(id);
+  }
+  return newSet;
+};
+
+const useFolded = create<FoldedState & FoldedStateAction>((set) => ({
+  foldedIds: new Set<number>(),
+  toggleFolded: (id: number) =>
+    set((state) => ({
+      foldedIds: getToggledFoldedIds(state, id),
+    })),
+}));
 
 const scrollToId = (id: string) => {
   const el = document.getElementById(id);
   el?.scrollIntoView({ behavior: "smooth" });
 };
 
-function CommentLink({
+export function CommentTime({
+  by,
+  unixTime,
+}: {
+  by: string;
+  unixTime: number;
+}) {
+  return (
+    <span suppressHydrationWarning>
+      {by} {unixTimeToRelative(unixTime)}
+    </span>
+  );
+}
+
+export function CommentLink({
   id,
   children,
 }: {
@@ -36,48 +76,27 @@ function CommentLink({
   );
 }
 
-export default function Comment({
-  comment,
-  commentContents,
-  commentChildren,
-  nextId,
-  prevId,
-  parentId,
-  isChild,
+export function CommentToggleFold({
+  id,
+  descendants,
 }: {
-  comment: CommentFull;
-  commentContents: React.ReactNode;
-  commentChildren: React.ReactNode;
-  nextId?: number;
-  prevId?: number;
-  parentId?: number;
-  isChild?: boolean;
+  id: number;
+  descendants: number;
 }) {
-  const [isFolded, setIsFolded] = useState(false);
-  const child = isChild !== undefined && isChild;
+  const foldedIds = useFolded((state) => state.foldedIds);
+  const toggleFolded = useFolded((state) => state.toggleFolded);
+
+  const isFolded = foldedIds.has(id);
 
   return (
-    <div className={`${child ? "pl-10" : ""}`} id={`comment-${comment.id}`}>
-      <div className="p-2">
-        <div className="text-xs text-gray-500">
-          <span suppressHydrationWarning>
-            {comment.by} {unixTimeToRelative(comment.time)}
-          </span>
-          <CommentLink id={parentId}>parent</CommentLink>
-          <CommentLink id={prevId}>prev</CommentLink>
-          <CommentLink id={nextId}>next</CommentLink>{" "}
-          <span
-            className="hover:underline"
-            onClick={() => {
-              setIsFolded((p) => !p);
-            }}
-          >
-            {isFolded ? `[${1 + comment.descendants} more]` : "[ – ]"}
-          </span>
-        </div>
-        <div className={isFolded ? "hidden" : ""}>{commentContents}</div>
-      </div>
-      <div className={isFolded ? "hidden" : ""}>{commentChildren}</div>
-    </div>
+    <span className="hover:underline" onClick={() => toggleFolded(id)}>
+      {isFolded ? `[${1 + descendants} more]` : "[ – ]"}
+    </span>
   );
+}
+
+export function CommentMaybeFoldNext({ id }: { id: number }) {
+  const foldedIds = useFolded((state) => state.foldedIds);
+  const isFolded = foldedIds.has(id);
+  return <div className={isFolded ? styles.foldNext : ""} />;
 }
